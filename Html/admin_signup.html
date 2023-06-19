@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Signup</title>
+  <link rel="stylesheet" href="/Css/admin_signup.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Admin Signup</h1>
+    <form id="signup-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit">Signup</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('signup-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+
+      // Create an admin object
+      var admin = {
+        username: username,
+        password: password
+      };
+
+      // Get the existing admins from local storage or create an empty array
+      var admins = JSON.parse(localStorage.getItem('admins')) || [];
+
+      // Check if the admin already exists
+      var existingAdmin = admins.find(function(adminItem) {
+        return adminItem.username === username;
+      });
+
+      if (existingAdmin) {
+        alert('Admin already exists!');
+        window.location.href = "admin_login.html";
+      } else {
+        // Add the new admin to the admins array
+        admins.push(admin);
+
+        // Save the updated admins array to local storage
+        localStorage.setItem('admins', JSON.stringify(admins));
+
+        alert('Admin signup successful!');
+        // Redirect to the admin login page
+        window.location.href = 'login_admin.html';
+      }
+    });
+  </script>
+</body>
+
+</html>
+

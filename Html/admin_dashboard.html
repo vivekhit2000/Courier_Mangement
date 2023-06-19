@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/Css/admin_dashboard.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1 id="welcome-message"></h1>
+    <div class="card">
+      <h2 onclick="toggleDropdown(this)">Shipments &#9662;</h2>
+      <ul id="shipments-dropdown">
+        <li><a href="admin_dashboard_shipmentlist.html">View Shipments</a></li>
+        <!-- <li><a href="pending_shipments.html">Pending Shipments</a></li>
+        <li><a href="completed_shipments.html">Completed Shipments</a></li> -->
+      </ul>
+    </div>
+    <div class="card">
+      <h2 onclick="toggleDropdown(this)">Users &#9662;</h2>
+      <ul id="users-dropdown">
+        <!-- User data will be dynamically added here -->
+      </ul>
+    </div>
+    <div class="card">
+      <h2 onclick="toggleDropdown(this)">Update Shipment Status &#9662;</h2>
+      <ul id="update_shipment-status-dropdown">
+        <div id="shipment-status-form" class="dropdown-content">
+          <form onsubmit="updateStatus(); return false;">
+            <label for="trackingNumber">Tracking Number:</label>
+            <input type="text" id="trackingNumber" placeholder="Enter tracking number">
+            <label for="newStatus">New Status:</label>
+            <select id="newStatus" required>
+              <option value="In Transit">In Transit</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Out of Delivery">Out of Delivery</option>
+              <option value="Delivered">Delivered</option>
+            </select>
+            <button type="submit">Update Status</button>
+          </form>
+        </div>
+      </ul>
+      <h3 id="track-id"></h3>
+    </div>
+    <div class="card">
+      <h2 onclick="toggleDropdown(this)">Delivery Partner &#9662;</h2>
+      <ul id="delivery-partner-dropdown">
+        <div id="assign-delivery-partner-form" class="dropdown-content">
+          <form onsubmit="assignDeliveryPartner(); return false;">
+            <label for="partnerName">Delivery Partner Name:</label>
+            <input type="text" id="partnerName" placeholder="Enter partner name" required>
+            <label for="trackingNumberDP">Tracking Number:</label>
+            <input type="text" id="trackingNumberDP" placeholder="Enter tracking number" required>
+            <button type="submit">Assign Partner</button>
+          </form>
+        </div>
+      </ul>
+    </div>
+
+  </div>
+  <div class="logout">
+    <a href="admin_login.html">Logout</a>
+  </div>
+  </div>
+
+  <script>
+    // Retrieve welcome message from local storage
+    var welcomeMessage = localStorage.getItem('welcomeMessage');
+    if (welcomeMessage) {
+      document.getElementById('welcome-message').textContent = welcomeMessage;
+    } else {
+      // Redirect to login page if welcome message not found
+      window.location.href = 'admin_login.html';
+    }
+
+    // Retrieve user data from local storage
+    var userData = JSON.parse(localStorage.getItem('userData')) || [];
+
+    // Display user data in the user-list element
+    var userListElement = document.getElementById('users-dropdown');
+    userListElement.innerHTML = '';
+
+    userData.forEach(function (user) {
+      var listItem = document.createElement('li');
+      listItem.textContent = user.username + ' - ' + user.email;;
+
+      userListElement.appendChild(listItem);
+    });
+    function generateTrackingId() {
+      // Generate a random alphanumeric string as the tracking ID
+      var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      var trackingId = "";
+      for (var i = 0; i < 10; i++) {
+        var randomIndex = Math.floor(Math.random() * characters.length);
+        trackingId += characters.charAt(randomIndex);
+      }
+      return trackingId;
+    }
+    
+    // Function to toggle the dropdown
+    function toggleDropdown(element) {
+      var dropdown = element.nextElementSibling;
+      dropdown.classList.toggle('show');
+    }
+
+    // Function to toggle the shipment status form
+    function toggleShipmentStatusForm() {
+      var shipmentStatusForm = document.getElementById('shipment-status-form');
+      shipmentStatusForm.classList.toggle('show');
+    }
+
+     // Function to assign delivery partner to a shipment
+     function assignDeliveryPartner() {
+      var partnerName = document.getElementById('partnerName').value;
+      var trackingNumber = document.getElementById('trackingNumberDP').value;
+      
+      var success = assignPartnerToShipment(partnerName, trackingNumber);
+      if (success) {
+        alert('Delivery partner assigned successfully!');
+      } else {
+        alert('Shipment not found!');
+      }
+    }
+
+    // Function to assign a delivery partner to a shipment
+    function assignPartnerToShipment(partnerName, trackingNumber) {
+      var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
+      for (var i = 0; i < shipments.length; i++) {
+        if (shipments[i].trackingId === trackingNumber) {
+          shipments[i].deliveryPartner = partnerName;
+          localStorage.setItem('shipment', JSON.stringify(shipments));
+          return true; // Delivery partner assigned successfully
+        }
+      }
+      return false; // Shipment not found
+    }
+
+    function updateStatus() {
+      var trackingNumber = document.getElementById('trackingNumber').value;
+      var newStatus = document.getElementById('newStatus').value;
+      var success_trackId = true
+      if (newStatus === 'Shipped'){
+        var newTrackid = generateTrackingId();
+        console.log("TRACK ID ",newTrackid)
+        success_trackId = updateShipmentTrackId(trackingNumber, newTrackid);
+        document.getElementById('track-id').innerHTML=newTrackid
+        console.log(document.getElementById("track-id"))
+      }
+      var success = updateShipmentStatus(trackingNumber, newStatus);
+      if (success && success_trackId) {
+        alert('Shipment status updated successfully!');
+      } else {
+        alert('Shipment not found!');
+      }
+    }
+
+    function updateShipmentStatus(trackingNumber, newStatus) {
+      var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
+      for (var i = 0; i < shipments.length; i++) {
+        if (shipments[i].trackingId === trackingNumber) {
+          shipments[i].status = newStatus;
+          localStorage.setItem('shipment', JSON.stringify(shipments));
+          return true; // Shipment status updated successfully
+        }
+      }
+      return false; // Shipment not found
+    }
+
+    function updateShipmentTrackId(trackingNumber, newTrackId) {
+      var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
+      console.log("trackingNumber new : ",typeof trackingNumber)
+      for (var i = 0; i < shipments.length; i++) {
+        console.log("shipments[i].trackingId :",typeof shipments[i].trackingId)
+        if (shipments[i].trackingId == trackingNumber) {
+          shipments[i].trackId = newTrackId;
+          localStorage.setItem('shipment', JSON.stringify(shipments));
+          return true; // Shipment status updated successfully
+        }
+      }
+      return false; // Shipment not found
+    }
+    
+  </script>
+</body>
+
+</html>

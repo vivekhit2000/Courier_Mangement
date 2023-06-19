@@ -1,0 +1,66 @@
+body {
+    background-image: url(/Pics/wallpaper3.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.box {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.box h2 {
+    text-align: center;
+    color: #644503;
+}
+
+#trackingId {
+    font-weight: bold;
+    color: #4a3434;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.home-button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.home-button a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f5e395;
+    border: 2px solid grey;
+    border-radius: 15px;
+    color: rgb(32, 34, 36);
+    border-radius: 5px;
+    font-weight: bold;
+}
+.home-button a:hover
+{
+    background-color: rgb(57, 52, 52);
+    color: burlywood;
+    text-decoration: underline;
+}
+
+#confirmation {
+    margin-top: 20px;
+}
+
+#confirmation ul {
+    padding-left: 20px;
+}
+
+#confirmation ul li {
+    margin-bottom: 10px;
+
+
+}

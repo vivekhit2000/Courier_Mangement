@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway</title>
+    <link rel="stylesheet" href="/Css/payment_gateway.css">
+</head>
+<body>
+    <div class="box">
+        <h2>Payment Gateway</h2>
+        <div id="paymentForm">
+            <label for="cardholderName">Cardholder Name:</label>
+            <input type="text" id="cardholderName" placeholder="Enter cardholder name" required>
+
+            <label for="cardNumber">Card Number:</label>
+            <input type="text" id="cardNumber" placeholder="Enter card number" required>
+
+            <label for="expirationDate">Expiration Date:</label>
+            <input type="text" id="expirationDate" placeholder="MM/YY" required>
+
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" placeholder="Enter CVV" required>
+
+            <button type="button" onclick="processPayment()">Pay Now</button>
+        </div>
+        <div id="paymentResult"></div>
+    </div>
+
+    <script>function processPayment() {
+        var cardholderName = document.getElementById("cardholderName").value;
+        var cardNumber = document.getElementById("cardNumber").value;
+        var expirationDate = document.getElementById("expirationDate").value;
+        var cvv = document.getElementById("cvv").value;
+    
+        // Replace the code below with your actual payment gateway integration logic
+    
+        // Simulating payment processing with a delay
+        setTimeout(function() {
+            var paymentResult = Math.random() < 0.8 ? "Payment Successful" : "Payment Failed";
+            document.getElementById("paymentResult").innerHTML = paymentResult;
+        }, 2000);
+    }
+    </script>
+</body>
+</html>

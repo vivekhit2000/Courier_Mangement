@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shipment List</title>
+  <link rel="stylesheet" href="/Css/admin_dashboard_shipmentlist.css">
+</head>
+
+<body>
+  <h1>Shipment List</h1>
+  <ul id="shipment-list"></ul>
+
+  <div class="center">
+    <a href="admin_dashboard.html" class="home-button">Home</a>
+  </div>
+
+  <script>
+    // Retrieve shipments from local storage
+    var shipments = JSON.parse(localStorage.getItem("shipment")) || [];
+
+    // Display shipments in the shipment list
+    var shipmentList = document.getElementById("shipment-list");
+    shipments.forEach(function (shipment) {
+      var listItem = document.createElement("li");
+      var track_id = shipment.trackId
+      if(!track_id){
+        track_id="Token Not Generated"
+      }
+      listItem.textContent = "ID: " + shipment.trackingId + " | " + "Sender Name: " + shipment.senderName + " | " + "Sender Email: " + shipment.senderEmail +" | " + "Tracking Id: " + track_id+" | "+" Status: "+ shipment.status;
+      shipmentList.appendChild(listItem);
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier Management Service</title>
+    <link rel="stylesheet" href="/Css/tracking.css">
+</head>
+
+<body>
+    <div class="box">
+        <div class="container">
+            <h1>Product Tracking</h1>
+            <form>
+                <label for="trackingNumber">Tracking Number:</label>
+                <input type="text" id="trackingNumber" placeholder="Enter tracking number">
+                <button type="button" onclick="trackProduct()">Track</button>
+            </form>
+            <div id="trackingResult"></div>
+        </div>
+        <div id="shipmentDetails">
+            <h2>Shipment Details</h2>
+            <p>Status: <span id="status"></span></p>
+            <p>Delivery Partner: <span id="deliveryPartner"></span></p> <!-- New line to display the delivery partner -->
+            <p>Location: <span id="location"></span></p>
+            <div class="home-button">
+                <a href="homepage.html">Home</a>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <script>
+        function getShipmentDetails(trackingNumber) {
+            var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
+            for (var i = 0; i < shipments.length; i++) {
+                console.log(shipments[i].trackingId, trackingNumber)
+                if (shipments[i].trackId == trackingNumber) {
+                    return shipments[i];
+                }
+            }
+            return null; // Shipment not found
+        }
+
+        function trackProduct() {
+            var trackingNumber = document.getElementById("trackingNumber").value;
+            // Replace the line below with your actual tracking code logic
+
+            // Simulating tracking logic using a predefined array of tracking statuses
+            var trackingStatuses = [
+                { status: "In transit", location: "City A" },
+                { status: "Out for delivery", location: "City B" },
+                { status: "Delivered", location: "City C" }
+            ];
+            var shipment = getShipmentDetails(trackingNumber);
+            console.log("shipment", shipment)
+            if (shipment) {
+                // Display shipment details
+                document.getElementById('status').innerHTML = shipment.status;
+                document.getElementById('location').innerHTML = shipment.senderAddress;
+                document.getElementById('deliveryPartner').innerHTML = shipment.deliveryPartner; // Set the delivery partner
+                document.getElementById('shipmentDetails').classList.add('open');
+            } else {
+                // Shipment not found
+                document.getElementById('status').innerHTML = 'Not Found';
+                document.getElementById('location').innerHTML = '';
+                document.getElementById('deliveryPartner').innerHTML = ''; // Clear the delivery partner
+                document.getElementById('shipmentDetails').classList.remove('open');
+            }
+        }
+    </script>
+</body>
+
+</html>

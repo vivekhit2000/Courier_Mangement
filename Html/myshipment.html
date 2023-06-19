@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier Management Service</title>
+    <link rel="stylesheet" href="/Css/myshipment.css">
+</head>
+</head>
+
+<body>
+
+    <h1>My Shipments</h1>
+    <ul id="trackingIdsList"></ul>
+
+    <div class="center">
+        <a href="homepage.html" class="home-button">Home</a>
+      </div>
+
+    <script>
+        window.onload = function () {
+            // Retrieve the logged-in user's email from localStorage
+            const loggedInUserEmail = JSON.parse(localStorage.getItem("loggedInUser")).email;
+            if (!loggedInUserEmail) {
+                console.log("User not logged in.");
+                return;
+            }
+
+            // Retrieve the shipment array from localStorage
+            const shipmentArray = JSON.parse(localStorage.getItem("shipment")) || [];
+
+            // Filter the shipment array to get tracking IDs for the logged-in user
+            const userTrackingIds = shipmentArray.filter(item => item.senderEmail === loggedInUserEmail);
+
+            // Display the tracking IDs in the HTML
+            const trackingIdsList = document.getElementById("trackingIdsList");
+            userTrackingIds.forEach(shipment => {
+                const li = document.createElement("li");
+                li.textContent = `Product_Weight: ${shipment.packageWeight}, Tracking ID: ${shipment.trackId}`;
+                trackingIdsList.appendChild(li);
+            });
+        };
+
+    </script>
+
+</body>
+
+</html>

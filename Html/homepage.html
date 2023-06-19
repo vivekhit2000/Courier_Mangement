@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier Management Service</title>
+    <link rel="stylesheet" href="/Css/homepage.css">
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="left4">
+            <!-- Left box for logo -->
+            <img src="/Pics/vans-5630777.png" alt="">
+            <div>CMS</div>
+        </div>
+        <div class="mid4">
+            <ul class="navbar4">
+                <li><a href="#">Home</a></li>
+                <li><a href="tracking.html">Tracking</a></li>
+                <li><a href="homepage_profile.html">Profile</a></li>
+                <!-- Add additional navigation items as needed -->
+                <li class="dropdown">
+                    <a class="dropdown-btn" href="#" onclick="toggleDropdown()">Shipments</a>
+                    <div id="shipmentsDropdown" class="dropdown-content">
+                        <a href="create_shipment.html">Create Shipment</a>
+                        <a href="myshipment.html">My Shipments</a>
+                    </div>
+                </li>
+                <li><a href="pricing.html">Pricing</a></li>
+            </ul>
+        </div>
+        <div class="right4">
+            <button class="btn">Contact</button>
+            <button class="btn">Logout</button>
+        </div>
+    </header>
+    <div class="contain4">
+        <h1>Delivering happiness and needs</h1>
+        <div id="userData">
+            <!-- User data will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Retrieve the user data from local storage
+        console.log("Home page called!!!")
+        var userData = JSON.parse(localStorage.getItem("loggedInUser")) || {};
+
+        // Function to populate the user data into the HTML element
+        function displayUserData(user) {
+            var userDataDiv = document.getElementById("userData");
+            userDataDiv.innerHTML = `
+                <h2>Welcome, ${user.username}!</h2>
+                <!-- Display other user data as needed -->
+            `;
+        }
+
+        // Call the function to display the user data
+        displayUserData(userData);
+
+        // Function to toggle the dropdown menu
+        function toggleDropdown() {
+            var dropdown = document.querySelector('.dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Logout button click event
+        var logoutBtn = document.querySelector(".right4 button:last-child");
+        logoutBtn.addEventListener("click", function () {
+            // Clear the user data from local storage
+            localStorage.removeItem("loggedInUser");
+
+            // Redirect to the login page
+            window.location.href = "login.html"; // Replace with your login page URL
+        });
+
+        // Close the dropdown if the user clicks outside of it
+        window.onclick = function (event) {
+            if (!event.target.matches('.dropdown-btn')) {
+                var dropdowns = document.querySelectorAll('.dropdown');
+                dropdowns.forEach(function (dropdown) {
+                    dropdown.classList.remove('active');
+                });
+            }
+        }
+
+    </script>
+</body>
+
+</html>

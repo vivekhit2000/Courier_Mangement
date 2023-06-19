@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Tracking ID</title>
+    <link rel="stylesheet" href="/Css/shipment_detail.css">
+</head>
+<body>
+    <div class="box">
+        <h2>Great! Thank you for choosing us. You can track your product by the Unique ID.</h2>
+        <div id="NoShipment"></div>
+        <div id="trackingId"></div>
+        <div id="shipmentDetails"></div>
+        <div id="confirmation"></div>
+
+    </div>
+    <div class="home-button">
+        <a href="homepage.html">Home</a>
+    </div>
+
+    <script>
+        // Get shipmentData from localstorage
+        var shipmentData = JSON.parse(localStorage.getItem("shipment"));
+        
+        // Convert string to array of objects or create an empty array if null
+       // var shipmentDataArray1 = shipmentData ? JSON.parse(shipmentData) : [];
+        //console.log("Shipment data checker", JSON.parse(shipmentDataArray1[shipmentDataArray1.length-1]))
+        var shipmentDataArray= shipmentData[shipmentData.length-1]
+        // Get loggedinUser from localstorage
+        //var loggedinUser = JSON.parse(localStorage.getItem("loggedInUser"));
+        //var loggedinUserArray = JSON.parse(loggedinUser);
+        
+        // Display shipment details
+        document.getElementById("trackingId").innerHTML = shipmentDataArray.trackingId;
+        document.getElementById("confirmation").innerHTML = `
+            <p>Shipment created with details:</p>
+            <ul>
+                <li><b>Sender Name:</b> ${shipmentDataArray.senderName}</li>
+                <li><b>Sender Address:</b> ${shipmentDataArray.senderAddress}</li>
+                <li><b>Package Weight:</b> ${shipmentDataArray.packageWeight} Kg</li>
+                <li><b>Package Dimensions:</b> ${shipmentDataArray.packageDimensions}</li>
+                <li><b>Additional Instructions:</b> ${shipmentDataArray.additionalInstructions}</li>
+                <li><b>Shipping Option:</b> ${shipmentDataArray.shippingOption}</li>
+                <li><b>Shipping Cost:</b> ₹${shipmentDataArray.shippingRate}</li>
+            </ul>
+        `;
+
+        // Save the shipment data to the array
+        //shipmentDataArray1.push(shipmentDataArray);
+
+        // Convert array to string and save in local storage
+        //localStorage.setItem("shipment", JSON.stringify(shipmentDataArray1));
+    </script>
+</body>
+</html>

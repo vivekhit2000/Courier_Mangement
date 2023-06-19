@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Courier Management Service</title>
+  <link rel="stylesheet" href="/Css/create_shipment.css">
+</head>
+
+<body>
+  <div class="box">
+    <h1>Create Shipment</h1>
+    <form id="shipmentForm">
+      <label for="senderName">Sender Name:</label>
+      <input type="text" id="senderName" required>
+
+      <label for="senderEmail">Sender Email:</label>
+      <input type="text" id="senderEmail" required>
+
+      <label for="senderAddress">Sender Address:</label>
+      <input type="text" id="senderAddress" required>
+
+      <label for="packageWeight">Package Weight (in kg):</label>
+      <input type="number" id="packageWeight" required>
+
+      <label for="packageDimensions">Package Dimensions:</label>
+      <input type="text" id="packageDimensions" required>
+
+      <label for="additionalInstructions">Additional Instructions:</label>
+      <textarea id="additionalInstructions"></textarea>
+
+      <label for="shippingOptions">Shipping Options:</label>
+      <select id="shippingOptions">
+        <option value="basic">Basic</option>
+        <option value="standard">Standard</option>
+        <option value="premium">Premium</option>
+      </select>
+
+      <button type="submit">Create Shipment</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("shipmentForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      
+      // Get form inputs
+      var senderName = document.getElementById("senderName").value;
+      var senderEmail = document.getElementById("senderEmail").value;
+      var senderAddress = document.getElementById("senderAddress").value;
+      var packageWeight = parseFloat(document.getElementById("packageWeight").value);
+      var packageDimensions = document.getElementById("packageDimensions").value;
+      var additionalInstructions = document.getElementById("additionalInstructions").value;
+      var shippingOption = document.getElementById("shippingOptions").value;
+
+      // Calculate shipping rate based on package details
+      var rate = calculateRate(packageWeight, shippingOption);
+
+      // Generate Tracking id
+      var id = generateId();
+
+      // Create shipment object
+      var shipmentObj = {
+        senderName: senderName,
+        senderEmail: senderEmail,
+        senderAddress: senderAddress,
+        packageWeight: packageWeight,
+        packageDimensions: packageDimensions,
+        additionalInstructions: additionalInstructions,
+        shippingOption: shippingOption,
+        shippingRate: rate,
+        status:"In Transit",
+        trackingId: id,
+        trackId : ""
+      };
+
+      // Retrieve existing shipments from local storage
+      var existingShipments = JSON.parse(localStorage.getItem("shipment")) || [];
+
+      // Add the new shipment object to the array
+      existingShipments.push(shipmentObj);
+
+      // Convert the updated array to JSON string
+      var updatedShipments = JSON.stringify(existingShipments);
+
+      // Store the updated JSON string in local storage
+      localStorage.setItem("shipment", updatedShipments);
+
+      // Redirect to shipment_detail.html
+      window.location.href = "shipment_detail.html";
+    });
+
+    function calculateRate(weight, shippingOption) {
+      // Perform rate calculation based on weight and shipping option
+      // Return the calculated rate (this is a placeholder implementation)
+      var rate = 0;
+      if (shippingOption === "premium") {
+        rate = weight * 2.5;
+      } else if (shippingOption === "standard") {
+        rate = weight * 1.5;
+      } else if (shippingOption === "basic") {
+        rate = weight * 1.2;
+      }
+      return rate.toFixed(2);
+    }
+
+    function generateId() {
+        // Retrieve the array from localStorage
+        const shipmentArray = JSON.parse(localStorage.getItem("shipment")) || [];
+
+        // Calculate the ID by adding 1 to the array length
+        const id = shipmentArray.length + 1;
+        console.log("TRACK ID : ID : ")
+
+        return id.toString();;
+    }
+
+
+  </script>
+</body>
+
+</html>
