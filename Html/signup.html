@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +9,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Courier Service Management</title>
-  <link rel="stylesheet" href="/Css/signup.css">
+  <link rel="stylesheet" href="/Courier_Mangement/Css/signup.css">
 </head>
 
 <body>
@@ -65,7 +68,6 @@
         return;
       }
 
-      var userData = JSON.parse(localStorage.getItem('userData')) || [];
       var user = {
         username: username,
         dob: dob,
@@ -75,14 +77,30 @@
         password: password
       };
 
-      userData.push(user);
-      localStorage.setItem("userData", JSON.stringify(userData));
-      localStorage.setItem("key1",'a');
-      
+      fetch('http://localhost:8098/api/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      })
+      .then(response => {
+        if (response.ok) {
+          window.location.href = "login.html";
+        } else {
+          throw new Error('Error: ' + response.status);
+        }
+      })
+      .catch(error => {
+        console.error(error);
 
-      window.location.href = "login.html";
+        // window.location.href = "login.html";
+      });
     });
   </script>
 </body>
 
 </html>
+
+
+

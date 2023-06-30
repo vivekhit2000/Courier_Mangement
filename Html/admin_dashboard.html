@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="/Css/admin_dashboard.css">
+  <link rel="stylesheet" href="/Courier_Mangement/Css/admin_dashboard.css">
 </head>
 
 <body>
@@ -16,14 +16,11 @@
       <h2 onclick="toggleDropdown(this)">Shipments &#9662;</h2>
       <ul id="shipments-dropdown">
         <li><a href="admin_dashboard_shipmentlist.html">View Shipments</a></li>
-        <!-- <li><a href="pending_shipments.html">Pending Shipments</a></li>
-        <li><a href="completed_shipments.html">Completed Shipments</a></li> -->
       </ul>
     </div>
     <div class="card">
       <h2 onclick="toggleDropdown(this)">Users &#9662;</h2>
       <ul id="users-dropdown">
-        <!-- User data will be dynamically added here -->
       </ul>
     </div>
     <div class="card">
@@ -77,19 +74,24 @@
       window.location.href = 'admin_login.html';
     }
 
-    // Retrieve user data from local storage
-    var userData = JSON.parse(localStorage.getItem('userData')) || [];
+    // Retrieve user data from the backend API
+    fetch("http://localhost:8098/api/users")
+      .then(response => response.json())
+      .then(data => {
+        var userListElement = document.getElementById('users-dropdown');
+        userListElement.innerHTML = '';
 
-    // Display user data in the user-list element
-    var userListElement = document.getElementById('users-dropdown');
-    userListElement.innerHTML = '';
+        data.forEach(function (user) {
+          var listItem = document.createElement('li');
+          listItem.textContent = user.username + ' - ' + user.email;
 
-    userData.forEach(function (user) {
-      var listItem = document.createElement('li');
-      listItem.textContent = user.username + ' - ' + user.email;;
+          userListElement.appendChild(listItem);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
 
-      userListElement.appendChild(listItem);
-    });
     function generateTrackingId() {
       // Generate a random alphanumeric string as the tracking ID
       var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -100,7 +102,7 @@
       }
       return trackingId;
     }
-    
+
     // Function to toggle the dropdown
     function toggleDropdown(element) {
       var dropdown = element.nextElementSibling;
@@ -113,45 +115,54 @@
       shipmentStatusForm.classList.toggle('show');
     }
 
-     // Function to assign delivery partner to a shipment
-     function assignDeliveryPartner() {
+    // Function to assign delivery partner to a shipment
+    function assignDeliveryPartner() {
       var partnerName = document.getElementById('partnerName').value;
       var trackingNumber = document.getElementById('trackingNumberDP').value;
-      
-      var success = assignPartnerToShipment(partnerName, trackingNumber);
-      if (success) {
-        alert('Delivery partner assigned successfully!');
-      } else {
-        alert('Shipment not found!');
-      }
+
+      // Make AJAX request to assign the delivery partner
+      var request = new XMLHttpRequest();
+      request.open('POST', 'http://localhost:8098/api/shipments/assign-partner', true);
+      request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+      var promise = new Promise(function (resolve, reject) {
+        request.onload = function () {
+          if (request.status >= 200 && request.status < 400) {
+            resolve('Delivery partner assigned successfully!');
+          } else {
+            reject('Shipment not found!');
+          }
+        };
+        request.onerror = function () {
+          reject('Error assigning delivery partner');
+        };
+      });
+
+      request.send('partnerName=' + encodeURIComponent(partnerName) + '&trackingNumber=' + encodeURIComponent(trackingNumber));
+
+      promise.then(function (successMessage) {
+        alert(successMessage);
+      }).catch(function (errorMessage) {
+        alert(errorMessage);
+      });
     }
 
-    // Function to assign a delivery partner to a shipment
-    function assignPartnerToShipment(partnerName, trackingNumber) {
-      var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
-      for (var i = 0; i < shipments.length; i++) {
-        if (shipments[i].trackingId === trackingNumber) {
-          shipments[i].deliveryPartner = partnerName;
-          localStorage.setItem('shipment', JSON.stringify(shipments));
-          return true; // Delivery partner assigned successfully
-        }
-      }
-      return false; // Shipment not found
-    }
-
-    function updateStatus() {
+    async function updateStatus() {
       var trackingNumber = document.getElementById('trackingNumber').value;
       var newStatus = document.getElementById('newStatus').value;
-      var success_trackId = true
-      if (newStatus === 'Shipped'){
-        var newTrackid = generateTrackingId();
-        console.log("TRACK ID ",newTrackid)
-        success_trackId = updateShipmentTrackId(trackingNumber, newTrackid);
-        document.getElementById('track-id').innerHTML=newTrackid
-        console.log(document.getElementById("track-id"))
+      var successTrackId = true;
+
+      if (newStatus === 'Shipped') {
+        var newTrackId = generateTrackingId();
+        console.log("TRACK ID ", newTrackId);
+        successTrackId = await updateShipmentTrackId(trackingNumber, newTrackId);
+        document.getElementById('track-id').innerHTML = newTrackId;
+        console.log(document.getElementById("track-id"));
       }
-      var success = updateShipmentStatus(trackingNumber, newStatus);
-      if (success && success_trackId) {
+
+      var success = await updateShipmentStatus(trackingNumber, newStatus);
+
+      if (success && successTrackId) {
         alert('Shipment status updated successfully!');
       } else {
         alert('Shipment not found!');
@@ -159,31 +170,50 @@
     }
 
     function updateShipmentStatus(trackingNumber, newStatus) {
-      var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
-      for (var i = 0; i < shipments.length; i++) {
-        if (shipments[i].trackingId === trackingNumber) {
-          shipments[i].status = newStatus;
-          localStorage.setItem('shipment', JSON.stringify(shipments));
-          return true; // Shipment status updated successfully
-        }
-      }
-      return false; // Shipment not found
+      return new Promise(function (resolve, reject) {
+        // Make AJAX request to update the shipment status
+        var request = new XMLHttpRequest();
+        request.open('POST', 'http://localhost:8098/api/shipments/update-status', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        request.onload = function () {
+          if (request.status >= 200 && request.status < 400) {
+            resolve(true);
+          } else {
+            reject(false);
+          }
+        };
+
+        request.onerror = function () {
+          reject(false);
+        };
+
+        request.send('trackingNumber=' + encodeURIComponent(trackingNumber) + '&newStatus=' + encodeURIComponent(newStatus));
+      });
     }
 
     function updateShipmentTrackId(trackingNumber, newTrackId) {
-      var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
-      console.log("trackingNumber new : ",typeof trackingNumber)
-      for (var i = 0; i < shipments.length; i++) {
-        console.log("shipments[i].trackingId :",typeof shipments[i].trackingId)
-        if (shipments[i].trackingId == trackingNumber) {
-          shipments[i].trackId = newTrackId;
-          localStorage.setItem('shipment', JSON.stringify(shipments));
-          return true; // Shipment status updated successfully
-        }
-      }
-      return false; // Shipment not found
+      return new Promise(function (resolve, reject) {
+        // Make AJAX request to update the shipment tracking ID
+        var request = new XMLHttpRequest();
+        request.open('POST', 'http://localhost:8098/api/shipments/update-trackid', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        request.onload = function () {
+          if (request.status >= 200 && request.status < 400) {
+            resolve(true);
+          } else {
+            reject(false);
+          }
+        };
+
+        request.onerror = function () {
+          reject(false);
+        };
+
+        request.send('trackingNumber=' + encodeURIComponent(trackingNumber) + '&newTrackId=' + encodeURIComponent(newTrackId));
+      });
     }
-    
   </script>
 </body>
 

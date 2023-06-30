@@ -6,8 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courier Management Service</title>
-    <link rel="stylesheet" href="/Css/homepage.css">
-
+    <link rel="stylesheet" href="/Courier_Mangement/Css/homepage.css">
 </head>
 
 <body>
@@ -22,7 +21,6 @@
                 <li><a href="#">Home</a></li>
                 <li><a href="tracking.html">Tracking</a></li>
                 <li><a href="homepage_profile.html">Profile</a></li>
-                <!-- Add additional navigation items as needed -->
                 <li class="dropdown">
                     <a class="dropdown-btn" href="#" onclick="toggleDropdown()">Shipments</a>
                     <div id="shipmentsDropdown" class="dropdown-content">
@@ -35,7 +33,7 @@
         </div>
         <div class="right4">
             <button class="btn">Contact</button>
-            <button class="btn">Logout</button>
+            <button class="btn" onclick="logoutUser()">Logout</button>
         </div>
     </header>
     <div class="contain4">
@@ -47,7 +45,6 @@
 
     <script>
         // Retrieve the user data from local storage
-        console.log("Home page called!!!")
         var userData = JSON.parse(localStorage.getItem("loggedInUser")) || {};
 
         // Function to populate the user data into the HTML element
@@ -68,15 +65,14 @@
             dropdown.classList.toggle('active');
         }
 
-        // Logout button click event
-        var logoutBtn = document.querySelector(".right4 button:last-child");
-        logoutBtn.addEventListener("click", function () {
+        // Function to logout the user
+        function logoutUser() {
             // Clear the user data from local storage
             localStorage.removeItem("loggedInUser");
 
             // Redirect to the login page
-            window.location.href = "login.html"; // Replace with your login page URL
-        });
+            window.location.href = "login.html";
+        }
 
         // Close the dropdown if the user clicks outside of it
         window.onclick = function (event) {
@@ -87,8 +83,8 @@
                 });
             }
         }
-
     </script>
 </body>
 
 </html>
+

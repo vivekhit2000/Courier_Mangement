@@ -2,6 +2,65 @@
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Shipments</title>
+  <link rel="stylesheet" href="/Courier_Mangement/Css/myshipment.css">
+</head>
+
+<body>
+  <h1>My Shipments</h1>
+  <ul id="trackingIdsList"></ul>
+
+  <div class="center">
+    <a href="homepage.html" class="home-button">Home</a>
+  </div>
+
+  <script>
+    window.onload = function () {
+      // Retrieve the logged-in user's username from the session storage
+      const loggedInUsername = sessionStorage.getItem("username");
+      if (!loggedInUsername) {
+        console.log("User not logged in.");
+        return;
+      }
+
+      // Make an AJAX request to retrieve the shipment data for the logged-in user from the backend API
+      fetch(`http://localhost:8098/api/users/shipments?username`)
+        .then(response => response.json())
+        .then(data => {
+          // Display the tracking IDs in the HTML
+          const trackingIdsList = document.getElementById("trackingIdsList");
+          if (data.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "No shipments found for the user.";
+            trackingIdsList.appendChild(li);
+          } else {
+            data.forEach(shipment => {
+              const li = document.createElement("li");
+              li.textContent = `Product_Weight: ${shipment.packageWeight}, Tracking ID: ${shipment.trackId}`;
+              trackingIdsList.appendChild(li);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching shipment data:', error);
+        });
+    };
+  </script>
+
+</body>
+
+</html>
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,8 +102,10 @@
             });
         };
 
+        
+
     </script>
 
 </body>
 
-</html>
+</html> -->

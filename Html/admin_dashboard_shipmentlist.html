@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shipment List</title>
-  <link rel="stylesheet" href="/Css/admin_dashboard_shipmentlist.css">
+  <link rel="stylesheet" href="/Courier_Mangement/Css/admin_dashboard_shipmentlist.css">
 </head>
 
 <body>
@@ -18,21 +17,34 @@
   </div>
 
   <script>
-    // Retrieve shipments from local storage
-    var shipments = JSON.parse(localStorage.getItem("shipment")) || [];
+    // Function to fetch shipments from the server
+    function fetchShipments() {
+      fetch("http://localhost:8098/api/shipments")
+        .then(response => response.json())
+        .then(data => {
+          // Display shipments in the shipment list
+          var shipmentList = document.getElementById("shipment-list");
+          shipmentList.innerHTML = '';
 
-    // Display shipments in the shipment list
-    var shipmentList = document.getElementById("shipment-list");
-    shipments.forEach(function (shipment) {
-      var listItem = document.createElement("li");
-      var track_id = shipment.trackId
-      if(!track_id){
-        track_id="Token Not Generated"
-      }
-      listItem.textContent = "ID: " + shipment.trackingId + " | " + "Sender Name: " + shipment.senderName + " | " + "Sender Email: " + shipment.senderEmail +" | " + "Tracking Id: " + track_id+" | "+" Status: "+ shipment.status;
-      shipmentList.appendChild(listItem);
-    });
+          data.forEach(function (shipment) {
+            var listItem = document.createElement("li");
+            var track_id = shipment.trackId;
+            if (!track_id) {
+              track_id = "Token Not Generated";
+            }
+            listItem.textContent = "ID: " + shipment.trackingId + " | " + "Sender Name: " + shipment.senderName + " | " + "Sender Email: " + shipment.senderEmail + " | " + "Tracking Id: " + track_id + " | " + " Status: " + shipment.status;
+            shipmentList.appendChild(listItem);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching shipments", error);
+        });
+    }
+
+    // Call the fetchShipments function to load shipments on page load
+    fetchShipments();
   </script>
 </body>
 
 </html>
+

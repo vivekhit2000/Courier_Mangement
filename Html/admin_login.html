@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login</title>
-  <link rel="stylesheet" href="/Css/admin_login.css">
+  <link rel="stylesheet" href="/Courier_Mangement/Css/admin_login.css">
 </head>
 
 <body>
@@ -32,23 +32,33 @@
       var username = document.getElementById('username').value;
       var password = document.getElementById('password').value;
 
-      // Get the admins from local storage
-      var admins = JSON.parse(localStorage.getItem('admins')) || [];
+      // Create an admin object
+      var admin = {
+        username: username,
+        password: password
+      };
 
-      // Check if the admin exists and the credentials are valid
-      var admin = admins.find(function(adminItem) {
-        return adminItem.username === username && adminItem.password === password;
+      // Send the admin object as JSON in the POST request body
+      fetch("http://localhost:8098/admins/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(admin)
+      })
+      .then(response => {
+        if (response.ok) {
+          // Redirect to the admin dashboard with a welcome message
+          var welcomeMessage = 'Welcome ' + username + '!';
+          localStorage.setItem('welcomeMessage', welcomeMessage);
+          window.location.href = 'admin_dashboard.html';
+        } else {
+          alert('Invalid username or password. Please try again.');
+        }
+      })
+      .catch(error => {
+        console.error("Error logging in admin", error);
       });
-
-      if (admin) {
-        // Redirect to the admin dashboard with a welcome message
-        var welcomeMessage = 'Welcome ' + admin.username + ' !! ' ;
-        localStorage.setItem('welcomeMessage', welcomeMessage);
-        window.location.href = 'admin_dashboard.html';
-      } else {
-        alert('Invalid username or password. Please try again.');
-      }
-      
     });
   </script>
 </body>

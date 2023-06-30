@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courier Management Service</title>
-    <link rel="stylesheet" href="/Css/tracking.css">
+    <link rel="stylesheet" href="/Courier_Mangement/Css/tracking.css">
 </head>
 
 <body>
@@ -23,53 +23,46 @@
         <div id="shipmentDetails">
             <h2>Shipment Details</h2>
             <p>Status: <span id="status"></span></p>
-            <p>Delivery Partner: <span id="deliveryPartner"></span></p> <!-- New line to display the delivery partner -->
-            <p>Location: <span id="location"></span></p>
+            <p>Delivery Partner: <span id="deliveryPartner"></span></p>
+            <p>Location: <span id="shipmentLocation"></span></p>
             <div class="home-button">
                 <a href="homepage.html">Home</a>
             </div>
         </div>
     </div>
-    
-
 
     <script>
-        function getShipmentDetails(trackingNumber) {
-            var shipments = JSON.parse(localStorage.getItem('shipment')) || [];
-            for (var i = 0; i < shipments.length; i++) {
-                console.log(shipments[i].trackingId, trackingNumber)
-                if (shipments[i].trackId == trackingNumber) {
-                    return shipments[i];
-                }
-            }
-            return null; // Shipment not found
+        function getShipmentDetails(trackId) {
+            return fetch(`http://localhost:8098/api/shipments/track-id/${trackId}`)
+                .then(response => response.json())
+                .then(data => {
+                    return data; // Return the shipment details
+                })
+                .catch(error => {
+                    console.error('Error fetching shipment details:', error);
+                    return null; // Shipment not found or error occurred
+                });
         }
 
         function trackProduct() {
-            var trackingNumber = document.getElementById("trackingNumber").value;
-            // Replace the line below with your actual tracking code logic
+            var trackId = document.getElementById("trackingNumber").value;
+            var shipmentPromise = getShipmentDetails(trackId);
 
-            // Simulating tracking logic using a predefined array of tracking statuses
-            var trackingStatuses = [
-                { status: "In transit", location: "City A" },
-                { status: "Out for delivery", location: "City B" },
-                { status: "Delivered", location: "City C" }
-            ];
-            var shipment = getShipmentDetails(trackingNumber);
-            console.log("shipment", shipment)
-            if (shipment) {
-                // Display shipment details
-                document.getElementById('status').innerHTML = shipment.status;
-                document.getElementById('location').innerHTML = shipment.senderAddress;
-                document.getElementById('deliveryPartner').innerHTML = shipment.deliveryPartner; // Set the delivery partner
-                document.getElementById('shipmentDetails').classList.add('open');
-            } else {
-                // Shipment not found
-                document.getElementById('status').innerHTML = 'Not Found';
-                document.getElementById('location').innerHTML = '';
-                document.getElementById('deliveryPartner').innerHTML = ''; // Clear the delivery partner
-                document.getElementById('shipmentDetails').classList.remove('open');
-            }
+            shipmentPromise.then(shipment => {
+                if (shipment) {
+                    // Display shipment details
+                    document.getElementById('status').innerHTML = shipment.status;
+                    document.getElementById('shipmentLocation').innerHTML = shipment.senderAddress;
+                    document.getElementById('deliveryPartner').innerHTML = shipment.deliveryPartner;
+                    document.getElementById('shipmentDetails').classList.add('open');
+                } else {
+                    // Shipment not found
+                    document.getElementById('status').innerHTML = 'Not Found';
+                    document.getElementById('shipmentLocation').innerHTML = '';
+                    document.getElementById('deliveryPartner').innerHTML = '';
+                    document.getElementById('shipmentDetails').classList.remove('open');
+                }
+            });
         }
     </script>
 </body>

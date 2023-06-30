@@ -2,69 +2,80 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Courier Service Management</title>
-  <link rel="stylesheet" href="/Css/login.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier Service Management</title>
+    <link rel="stylesheet" href="/Courier_Mangement/Css/login.css">
 </head>
 
 <body>
-  <div class="container">
-    <div class="screen">
-      <div class="screen__content">
-        <form class="login" id="loginForm">
-          <div class="login__field">
-            <i class="login__icon fas fa-user"></i>
-            <input type="text" class="login__input" id="username" placeholder="User name / Email">
-          </div>
-          <div class="login__field">
-            <i class="login__icon fas fa-lock"></i>
-            <input type="password" class="login__input" id="password" placeholder="Password">
-          </div>
-          <button class="button login__submit">
-            <span class="button__text">Log In</span>
-            <i class="button__icon fas fa-chevron-right"></i>
-          </button>				
-        </form>
-        
-        <div class="signup-link">
-          <p><a href="signup.html">Sign up</a></p>
-          
+    <div class="container">
+        <div class="screen">
+            <div class="screen__content">
+                <form class="login" id="loginForm" action="/api/users/login" method="POST">
+                    <div class="login__field">
+                        <i class="login__icon fas fa-user"></i>
+                        <input type="text" class="login__input" id="username" placeholder="User name / Email">
+                    </div>
+                    <div class="login__field">
+                        <i class="login__icon fas fa-lock"></i>
+                        <input type="password" class="login__input" id="password" placeholder="Password">
+                    </div>
+                    <button class="button login__submit">
+                        <span class="button__text">Log In</span>
+                        <i class="button__icon fas fa-chevron-right"></i>
+                    </button>
+                </form>
+
+                <div class="signup-link">
+                    <p><a href="signup.html">Sign up</a></p>
+                </div>
+            </div>
+            <div class="screen__background">
+                <span class="screen__background__shape screen__background__shape4"></span>
+                <span class="screen__background__shape screen__background__shape3"></span>
+                <span class="screen__background__shape screen__background__shape2"></span>
+                <span class="screen__background__shape screen__background__shape1"></span>
+            </div>
         </div>
-      </div>
-      <div class="screen__background">
-        <span class="screen__background__shape screen__background__shape4"></span>
-        <span class="screen__background__shape screen__background__shape3"></span>		
-        <span class="screen__background__shape screen__background__shape2"></span>
-        <span class="screen__background__shape screen__background__shape1"></span>
-
-      </div>
     </div>
-  </div>
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', function (event) {
-      event.preventDefault(); // Prevent form submission
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form submission
 
-      var username = document.getElementById('username').value;
-      var password = document.getElementById('password').value;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
 
-      var userData = JSON.parse(localStorage.getItem('userData')) || [];
-
-      var loggedInUser = userData.find(function (user) {
-        return user.username === username && user.password === password;
-      });
-
-      if (loggedInUser) {
-        localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-        console.log("Logged in Successfully now navigating to Home !!!")
-        window.location.href = "homepage.html";
-      } else {
-        alert("Invalid username or password");
-      }
-    });
-  </script>
+            fetch("http://localhost:8098/api/users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            })
+                .then(function (response) {
+                    if (response.ok) {
+                        // Successful login, save the user data to local storage
+                        response.json().then(function (user) {
+                            localStorage.setItem("loggedInUser", JSON.stringify(user));
+                            console.log("Logged in successfully, navigating to homepage");
+                            window.location.href = "homepage.html";
+                        });
+                    } else {
+                        alert("Invalid username or password");
+                    }
+                })
+                .catch(function (error) {
+                    console.error("Error:", error);
+                });
+        });
+    </script>
 </body>
 
 </html>
+
 

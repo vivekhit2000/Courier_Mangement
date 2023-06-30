@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Signup</title>
-  <link rel="stylesheet" href="/Css/admin_signup.css">
+  <link rel="stylesheet" href="/Courier_Mangement/Css/admin_signup.css">
 </head>
 
 <body>
@@ -38,31 +38,26 @@
         password: password
       };
 
-      // Get the existing admins from local storage or create an empty array
-      var admins = JSON.parse(localStorage.getItem('admins')) || [];
-
-      // Check if the admin already exists
-      var existingAdmin = admins.find(function(adminItem) {
-        return adminItem.username === username;
-      });
-
-      if (existingAdmin) {
-        alert('Admin already exists!');
+      // Send the admin object as JSON in the POST request body
+      fetch("http://localhost:8098/admins/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(admin)
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert(data);
         window.location.href = "admin_login.html";
-      } else {
-        // Add the new admin to the admins array
-        admins.push(admin);
-
-        // Save the updated admins array to local storage
-        localStorage.setItem('admins', JSON.stringify(admins));
-
-        alert('Admin signup successful!');
-        // Redirect to the admin login page
-        window.location.href = 'login_admin.html';
-      }
+      })
+      .catch(error => {
+        console.error("Error signing up admin", error);
+      });
     });
   </script>
 </body>
 
 </html>
+
 

@@ -6,13 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Courier Management Service</title>
-  <link rel="stylesheet" href="/Css/create_shipment.css">
+  <link rel="stylesheet" href="/Courier_Mangement/Css/create_shipment.css">
 </head>
 
 <body>
   <div class="box">
     <h1>Create Shipment</h1>
-    <form id="shipmentForm">
+    <form id="shipmentForm" action="http://localhost:8098/shipments" method="POST">
       <label for="senderName">Sender Name:</label>
       <input type="text" id="senderName" required>
 
@@ -26,7 +26,7 @@
       <input type="number" id="packageWeight" required>
 
       <label for="packageDimensions">Package Dimensions:</label>
-      <input type="text" id="packageDimensions" required>
+      <input type="text" id="packageDimensions">
 
       <label for="additionalInstructions">Additional Instructions:</label>
       <textarea id="additionalInstructions"></textarea>
@@ -76,20 +76,23 @@
         trackId : ""
       };
 
-      // Retrieve existing shipments from local storage
-      var existingShipments = JSON.parse(localStorage.getItem("shipment")) || [];
-
-      // Add the new shipment object to the array
-      existingShipments.push(shipmentObj);
-
-      // Convert the updated array to JSON string
-      var updatedShipments = JSON.stringify(existingShipments);
-
-      // Store the updated JSON string in local storage
-      localStorage.setItem("shipment", updatedShipments);
-
-      // Redirect to shipment_detail.html
-      window.location.href = "shipment_detail.html";
+      // Send the shipment object as JSON in the POST request body
+      fetch("http://localhost:8098/api/shipments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(shipmentObj)
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Shipment created successfully", data);
+        // Redirect to shipment_detail.html with shipment ID
+        window.location.href = `shipment_detail.html?id=${data.id}`;
+      })
+      .catch(error => {
+        console.error("Error creating shipment", error);
+      });
     });
 
     function calculateRate(weight, shippingOption) {
@@ -107,18 +110,23 @@
     }
 
     function generateId() {
-        // Retrieve the array from localStorage
-        const shipmentArray = JSON.parse(localStorage.getItem("shipment")) || [];
+  // Retrieve the last generated tracking ID from local storage
+  let lastTrackingId = localStorage.getItem("lastTrackingId");
 
-        // Calculate the ID by adding 1 to the array length
-        const id = shipmentArray.length + 1;
-        console.log("TRACK ID : ID : ")
+  // If no previous tracking ID exists, start with 1
+  let id = lastTrackingId ? parseInt(lastTrackingId) + 1 : 1;
 
-        return id.toString();;
-    }
+  // Store the new tracking ID in local storage
+  localStorage.setItem("lastTrackingId", id.toString());
+
+  return id.toString();
+}
 
 
   </script>
 </body>
 
 </html>
+
+
+
